@@ -6,7 +6,7 @@
 1. [Introduction](#introduction)  
 1. [Threat Models](#threat-models)
 1. [Trust Models](#trust-models)
-1. [Risk Management] (#risk-management)
+1. [Risk Management](#risk-management)
 1. [Selecting an FAL](#selecting-an-fal)  
 1. [Guidance for Relying Parties](#guidance-for-relying-parties)  
  7.1 [Purpose](#purpose)  
