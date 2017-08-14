@@ -87,7 +87,9 @@ IdPs have the difficult task of keeping track of many RPs and deciding how much 
 
 #### General Guidance
 
-Support discovery and easy registration.
+Much of the technical friction in identity transactions stems from IdPs which are built and configured in such a way that onboarding new RPs requires a significant amount of manual human intervention.
+
+Much of this friction is removed when IdPs support known discovery mechanisms and simple registration.
 
 #### Guidance by Product Family
 
@@ -95,11 +97,23 @@ There are three main product families that enable federated identity transaction
 
 ##### SAML
 
-Publish metadata in a well-known location. Apply best practices to protect user information. All pii must conform to FAL 2.
+Publish metadata in a well-known location. While there is no widely accepted standard for SAML metadata exchange, it is advisable to use a well-documented metadata endpoint to serve your IdPs metadata in the form of a single XML file to any RP who wishes to consume it.
+
+Only accept metadata that has been signed by the presenting RP, and always check the signature on that metadata.
+
+Identity federations like InCommon share the metadata of hundreds of IdPs and RPs in a structured manner. Adding your IdP's metadata to such federations will help RPs to find it easily.
+
+Apply best practices to protect user information. All SAML assertions containing personally identifyable information must conform to FAL2. That means the assertion must be encrypted to the relying party.
+
+Assertions containing only authentication information and no personally identifiable information do not need to encrypt their assertions. They may operate at FAL1.
 
 ##### OAuth and OpenID Connect
 
-IdPs at FAL 1 must never pass pii in the authentication assertion, but it's fine to make it available at an API endpoint.
+OpenID Connect has an established discovery mechanism. Your IdP's discovery documents should be published in JSON format at an HTTPS location ending in /.well-known/openid-configuration as specified in the OpenID Connect discovery specification.
+
+If personally identifiable information is made available at the UserInfo endpoint, it need not be encrypted. However, if personally identifiable information is bundled with authentication information in a token, it must be encrypted to the RP and conformant with FAL2.
+
+It is recommended that OpenID Connect IdPs support a registration endpoint to make it easy for RPs to register without manual intervention.
 
 ##### Kerberos
 
@@ -108,6 +122,8 @@ IdPs at FAL 1 must never pass pii in the authentication assertion, but it's fine
 Shibboleth and a SAML RP
 
 Vanilla OIDC and an OAuth RP
+
+PIV
 
 Parallel Auth
 
