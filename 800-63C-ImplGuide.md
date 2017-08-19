@@ -45,7 +45,11 @@ While SAML can only maintain white and blacklists, it is possible for IdPs using
 
 ### Risk Management
 
-Selecting and conforming to an FAL should be part of a larger risk management process and program. Conforming to FAL3 does not make your organization's security infallible. The risks of implementing a system at FAL1 or below may be negligible depending on relevant use cases and attack vectors.
+Selecting and conforming to an FAL should be part of a larger risk management process and program. Conforming to FAL3 does not make your organization's security infallible. Rather than attempting to make your federation infrastructure conform to the highest standards available, you should analyze the risks that are inherent in your organization and choose how strongly to protect against them given their severity and liklihood of occurance.
+
+FAL 1 is the industry standard for authentication at this point in time. The risks of implementing a system at FAL1 or below may be negligible depending on relevant use cases and attack vectors.
+
+Because it is the front door to many critical systems, authentication is a key piece of risk management strategy. Strong federation can protect against many potential user impersonation and man-in-the-middle attacks. If those threats are common to your organization, you should consider implementation of FAL2 or FAL3.
 
 ### Selecting an FAL
 
@@ -73,9 +77,15 @@ Be careful about passing and validating metadata. Always check certificates.
 
 ##### OAuth and OpenID Connect
 
-Different flows are appropriate for different kinds of applications at different FALs.
+Different OAuth grant types or "flows" are appropriate for different kinds of applications at different FALs.
 
-##### Kerberos
+The authorization code flow should be used whenever possible. It is the most common and most secure way to implement OAuth. It can accomodate all three FALs depending on the exact configuration of the application.
+
+The implicit grant type is appropriate for applications which are implemented entirely in front-end code and have to capability to store secrets outside of the user's web browser. The lack of ability to store secrets means that these sorts of applications can only function at FAL1 because they have no method of private key management which would enable encryption of identity assertions.
+
+The client credentials grant type is not recommended, since it does not require user interaction. Because applications using this grant type are capable of securely storing keys, these applications can function at FAL1 and FAL2. However, since no user interaction takes place during the authentication event, a holder-of-key proof cannot occur, preventing these sorts of applications from functioning at FAL3.
+
+The resource owner credentials grant type does not qualify for FAL1, FAL2, or FAL3, and should be avoided.
 
 ### Guidance for Identity Providers
 
@@ -115,17 +125,33 @@ If personally identifiable information is made available at the UserInfo endpoin
 
 It is recommended that OpenID Connect IdPs support a registration endpoint to make it easy for RPs to register without manual intervention.
 
-##### Kerberos
+There is a test suite for OpenID Connect providers to verify whether their instance of OpenID Connect is compliant with the standard. That test is located at [http://openid.net/certification/testing/](http://openid.net/certification/testing/). If your provider passes these tests, you have the option of becoming a self-certified OpenID Connect provider. This will help other participants in the OpenID Connect ecosystem find you, and find out the exact configuration of your system.
+
+The OpenID Connect community has reviewed libraries in several different languages to search for bugs and non-compliant processes.Whenever possible, you should leverage [these libraries](http://openid.net/developers/libraries/) in your development.
+ 
+OpenID Connect relies heavily on the [JOSE standard](https://datatracker.ietf.org/wg/jose/about/), particularly JWT and JWK. All tokens an keys in your implementation should conform to those standards.
+
+You may also consider implementation of additional security standards like [token binding](https://datatracker.ietf.org/wg/tokbind/documents/) and [proof key for code exchange](https://tools.ietf.org/html/rfc7636). While those standards are not factors in determining the FAL of your instance, they considered to be best practice in the industry.
 
 ### Example Scenarios
 
-Shibboleth and a SAML RP
+#### Shibboleth and SAML
 
-Vanilla OIDC and an OAuth RP
+SAML Federations like InCommon can operate at FAL1 or FAL2. Most InCommon IdPs are running on a Shibboleth identity provider. They pass assertions through a response to an authentication event. Most often, those assertions are not encrypted to the RP.
 
-PIV
+If you are running a Shibboleth IdP, you must either encrypt your assertions to the RP, or refrain from sending personally identifiable information such as eppn over the wire as an unecrypted SAML assertion.
 
-Parallel Auth
+#### OpenID Connect and OAuth
+
+Typically, OpenID Connect Providers interact with OAuth relying parties by providing an authentication mechanism which is separate from the transfer of personally identifiable information. As such, these providers can safely operate at FAL1 because they are not bundling identity assertions with authentication information.
+
+#### PIV
+
+#### Parallel Authentication
+
+In some cases a relying party may wish to confirm certain aspects of a user's identity above and beyond what the IdP provides. For example, a relying party could verify a user with an IdP, receive a picture of the user, and require that an in-person agent verify that the picture matches the identity of the person authenticating.
+
+We call this use case "parallel authentication" because two authentication events are happening in parallel. The focus of FAL is primary on the assertions being passed from the IdP to the RP, so most authentication events occuring at the RP would not affect the FAL of the transaction. The exception to this rule is a holder-of-key authentication event. If the RP verifies in parallel that the user is in possession of a key that the IdP says they should have, that verification counts as a factor toward FAL3.
 
 ### Educational Resources
 
