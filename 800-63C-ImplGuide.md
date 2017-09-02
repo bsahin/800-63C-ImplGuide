@@ -4,8 +4,6 @@
 
 1. [Executive Summary](#executive-summary)
 1. [Introduction](#introduction)  
-1. [Threat Models](#threat-models)
-1. [Trust Models](#trust-models)
 1. [Risk Management](#risk-management)
 1. [Selecting an FAL](#selecting-an-fal)  
 1. [Guidance for Relying Parties](#guidance-for-relying-parties)  
@@ -23,6 +21,7 @@
      * 8.3.2 [OAuth](#oauth-1) 
      * 8.3.3 [OpenID Connect](#openid-connect-1)
 1. [Example Scenarios](#example-scenarios)
+1. [Brokered Identity Management](#brokered-identity-management)
 1. [Educational Resources](#educational-resources)
 1. [Communicating with Stakeholders](#communicating-with-stakeholders)
 1. [Conclusion](#conclusion)
@@ -33,19 +32,13 @@ Always check signatures and certificates. Always be careful with pii. Follow pri
 
 ### Introduction
 
-Federated identity transactions allow for a more secure more usable internet. Many products and libraries exist which enable those transactions at various levels of security. We'll be talking about what to look for in software that enables federation.
-
-### Trust Models
-
-There are lots of existing SAML federations you could join like inCommon.
-
-While SAML can only maintain white and blacklists, it is possible for IdPs using OAuth and OpenID connect to have greylists which enable them to make more nuanced security decisions.
+Federated identity transactions allow for a more secure more usable internet. Many products and libraries exist which enable those transactions at various levels of security. This document outlines what to look for in software that enables federation.
 
 ### Risk Management
 
 Selecting and conforming to an FAL should be part of a larger risk management process and program. Conforming to FAL3 does not make your organization's security infallible. Rather than attempting to make your federation infrastructure conform to the highest standards available, you should analyze the risks that are inherent in your organization and choose how strongly to protect against them given their severity and liklihood of occurance.
 
-FAL 1 is the industry standard for authentication at this point in time. The risks of implementing a system at FAL1 or below may be negligible depending on relevant use cases and attack vectors.
+FAL1 is the industry standard for authentication at this point in time. The risks of implementing a system at FAL1 or below may be negligible depending on relevant use cases and attack vectors.
 
 Because it is the front door to many critical systems, authentication is a key piece of risk management strategy. Strong federation can protect against many potential user impersonation and man-in-the-middle attacks. If those threats are common to your organization, you should consider implementation of FAL2 or FAL3.
 
@@ -150,6 +143,14 @@ Typically, OpenID Connect Providers interact with OAuth relying parties by provi
 In some cases a relying party may wish to confirm certain aspects of a user's identity above and beyond what the IdP provides. For example, a relying party could verify a user with an IdP, receive a picture of the user, and require that an in-person agent verify that the picture matches the identity of the person authenticating.
 
 We call this use case "parallel authentication" because two authentication events are happening in parallel. The focus of FAL is primary on the assertions being passed from the IdP to the RP, so most authentication events occuring at the RP would not affect the FAL of the transaction. The exception to this rule is a holder-of-key authentication event. If the RP verifies in parallel that the user is in possession of a key that the IdP says they should have, that verification counts as a factor toward FAL3.
+
+### Brokered Identity Management
+
+NIST has been promoting privacy-enhancing technology in the identity management space through the [Privacy-Enhanced Identity Federation project](https://nccoe.nist.gov/projects/building-blocks/privacy-enhanced-identity-brokers). This NIST building block outlines a set of goals which would constitute a new kind of federated architecture. This architecture leverages a third-party broker to blind the participants any given identity transaction to each other, so that users can securely authenticate without revealing information about their other activities online.
+
+One of the advantages of a brokered identity architecture is interoperability. Since all traffic is routed through a single broker, federation participants only need to go through one integration process. However, advances in automated registration processes have made integrations much less onerous than they used to be. In many cases, a federation can have a high level of interoperability even without a broker.
+
+While brokered identity management systems may appear to protect privacy by blinding an IdP from an RP, keep in mind that the broker itself is aware of all the parties involved in the transaction, and in some cases may be able to impersonate those parties. Often, brokered identity management systems only shift knowledge of transaction information from the IdP and RP to the broker.
 
 ### Educational Resources
 
