@@ -38,7 +38,7 @@ Federated identity transactions allow for a more secure more usable internet. Ma
 
 Selecting and conforming to an FAL should be part of a larger risk management process and program. Conforming to FAL3 does not make your organization's security infallible. Rather than attempting to make your federation infrastructure conform to the highest standards available, you should analyze the risks that are inherent in your organization and choose how strongly to protect against them given their severity and liklihood of occurance.
 
-FAL1 is the industry standard for authentication at this point in time. The risks of implementing a system at FAL1 or below may be negligible depending on relevant use cases and attack vectors.
+FAL1 is the industry standard for authentication at this point in time. The risks of implementing a system at FAL1 or below may be negligible depending on relevant use cases and attack vectors. 
 
 Because it is the front door to many critical systems, authentication is a key piece of risk management strategy. Strong federation can protect against many potential user impersonation and man-in-the-middle attacks. If those threats are common to your organization, you should consider implementation of FAL2 or FAL3.
 
@@ -60,7 +60,7 @@ Relying parties need to validate IdP signatures, assertion expirations, and audi
 
 #### Guidance by Product Family
 
-There are three main product families that enable federated identity transactions - SAML, OAuth/OpenID Connect, and Kerberos
+There are two main product families that enable federated identity transactions - SAML and OAuth/OpenID Connect.
 
 ##### SAML
 
@@ -146,11 +146,15 @@ We call this use case "parallel authentication" because two authentication event
 
 ### Brokered Identity Management
 
-NIST has been promoting privacy-enhancing technology in the identity management space through the [Privacy-Enhanced Identity Federation project](https://nccoe.nist.gov/projects/building-blocks/privacy-enhanced-identity-brokers). This NIST building block outlines a set of goals which would constitute a new kind of federated architecture. This architecture leverages a third-party broker to blind the participants any given identity transaction to each other, so that users can securely authenticate without revealing information about their other activities online.
+Some federated identity architectures are based on brokered identity management. In these architectures, a single broker intermediates transactions between registered IdPs and RPs. This means that each entity in the system only has to register with one broker in order to interoerate with everyone else in the system. It also means that an IdP can authenticate a user without knowledge of which RP requested the authentication event.
 
-One of the advantages of a brokered identity architecture is interoperability. Since all traffic is routed through a single broker, federation participants only need to go through one integration process. However, advances in automated registration processes have made integrations much less onerous than they used to be. In many cases, a federation can have a high level of interoperability even without a broker.
+Recent advances in automated registration processes have made IdP/RP integrations much less onerous than they used to be. It is possible for an IdP and RP to register with each other in a very short amount of time without any manual processes. This has lessened the value of brokered identity architectures, since interoperability can be simple and fast even without a central broker.
 
-While brokered identity management systems may appear to protect privacy by blinding an IdP from an RP, keep in mind that the broker itself is aware of all the parties involved in the transaction, and in some cases may be able to impersonate those parties. Often, brokered identity management systems only shift knowledge of transaction information from the IdP and RP to the broker.
+While brokered identity management systems may appear to protect privacy by blinding an IdP from an RP, keep in mind that the broker itself is aware of all the parties involved in the transaction, and in some cases can see personally identifiable information about users. Brokered identity management systems do not prevent user tracking all together, they merely shift the ability to track users from the IdPs and RPs to the broker.
+
+Additionally, because brokers have access to active valid identity assertions, they are capable of impersonating users. This increases the risk inherent in the entire architecture, since the broker represents a single point of failure which, if it is compromised, can in turn compromise every participant in the system.
+
+NIST has been promoting privacy-enhancing technology in the brokered identity management space through the [Privacy-Enhanced Identity Federation project](https://nccoe.nist.gov/projects/building-blocks/privacy-enhanced-identity-brokers). This NIST building block outlines a set of goals which would constitute a new kind of brokered architecture. This architecture leverages a broker which cannot impersonate or track users. This architecture is still theoretical, and may allow for a privacy-preserving and secure version of brokered identity management in the future.
 
 ### Educational Resources
 
