@@ -56,7 +56,25 @@ Relying parties can be a valuable target for attackers to impersonate valid user
 
 #### General Guidance
 
-Relying parties need to validate IdP signatures, assertion expirations, and audience parameters.
+Relying parties need to validate IdP signatures, assertion expirations, and audience parameters. Additionally, RPs need to test that these validation checks are working at all times because there will be no outward indication that something is wrong with the system until an attack occurs.
+
+##### Validating IdP Signatures
+
+An identity assertion is signed by an IdP so that it cannot be forged by an attacker. The IdP is the only entity with access to its private key, so a valid signature indicates that the assertion is from the IdP itself and not an attacker. If an RP does not check the validity of the IdP signature, attackers will be able to forge identity assertions, and gain access to protected systems without authorization. 
+
+It is critically important to check whether your RP will accept unsigned assertions or assertions signed with an invalid key. Properly authorized transactions will still work even if an RP isn't checking assertion signatures, so there is no outward indication of a problem in the system. There will be no error messages or login failures to indicate that something is wrong.
+
+##### Checking Assertion Expirations
+
+Federated identity assertions are intended to be short-lived. An identity assertion which expires quickly makes it difficult for attackers to misuse the assertion. It also ensures that any identity or authorization information included in the assertion is not out-of-date. Authorized transactions can occur at an RP that is not checking assertion expirations, but that RP will be significantly less secure. Always test your system with an expired assertion to make sure that it is not accepted as valid by the RP.
+
+##### Checking Audience Parameters
+
+When an IdP creates an assertion, it includes an audience parameter indicating which RP requested the assertion. This parameter is intended to reduce fraud by making it obvious when an attacker is replaying an assertion at a different RP. 
+
+If an RP does not check for a matching audience parameter, it is possible for an attacker to get a valid assertion from any RP registered with the IdP, and replay it to gain unauthorized access to a different RP.
+
+It is critically important to check whether your RP will accept assertions with a missing or incorrect audience parameter. Properly authorized transactions will still work even if an RP isn't checking audience parameters, so there is no outward indication of a problem in the system. There will be no error messages or login failures to indicate that something is wrong.
 
 #### Guidance by Product Family
 
