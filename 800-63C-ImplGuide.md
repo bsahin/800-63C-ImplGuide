@@ -154,7 +154,11 @@ If you are running a Shibboleth IdP, you must either encrypt your assertions to 
 
 Typically, OpenID Connect Providers interact with OAuth relying parties by providing an authentication mechanism which is separate from the transfer of personally identifiable information. As such, these providers can safely operate at FAL1 because they are not bundling identity assertions with authentication information.
 
-#### PIV
+#### Personal Identity Verification (PIV) card 
+
+Federation Assurance Levels are independent of Authenticator Assurance Levels. Any authentication device may be used to obtain any FAL, including but not limited to a Personal Identity Verification (PIV) card.
+
+There are many benefits to using federated identity management as opposed to requiring independent registration of PIV cards for each user. Federated identity management protocols such as OpenID Connect allow users to authenticate at a relying party regardless of which authenticator they use at their IdP. This allows relying parties to securely accept registered users whose IdPs do not use PIV cards.
 
 #### Parallel Authentication
 
