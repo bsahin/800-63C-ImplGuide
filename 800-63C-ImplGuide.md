@@ -171,38 +171,41 @@ OpenID Connect relies heavily on the [JOSE standard](https://datatracker.ietf.or
 
 You may also consider implementation of additional security standards like [token binding](https://datatracker.ietf.org/wg/tokbind/documents/) and [proof key for code exchange](https://tools.ietf.org/html/rfc7636). While those standards are not factors in determining the FAL of your instance, they considered to be best practice in the industry.
 
-### 6. Example Scenarios
+### 5. Example Scenarios
 
-#### 6.1 Shibboleth and SAML
+#### 5.1. Shibboleth and SAML
 
-SAML Federations like InCommon can operate at FAL1 or FAL2. Most InCommon IdPs are running on a Shibboleth identity provider. They pass assertions through a response to an authentication event. Most often, those assertions are not encrypted to the RP.
+SAML Federations like InCommon can operate at FAL1 or FAL2. Most InCommon IdPs are running on a Shibboleth identity provider. They pass assertions through a response to an authentication event. Most often, those assertions are not encrypted to the RP and therefore conform to FAL1 if they don't contain any personally identifiable information. If you are running a Shibboleth IdP, you must either encrypt your assertions to the RP, or refrain from sending personally identifiable information such as eppn over the wire as an unecrypted SAML assertion.
 
-If you are running a Shibboleth IdP, you must either encrypt your assertions to the RP, or refrain from sending personally identifiable information such as eppn over the wire as an unecrypted SAML assertion.
+#### 5.2 OpenID Connect
 
-#### 6.2 OpenID Connect and OAuth
+Typically, OpenID Connect Providers interact with OpenID Connect relying parties by providing a signed authentication assertion (the ID Token) which is separate from the transfer of personally identifiable information (from the UserInfo Endpoint). As such, these providers can safely operate at FAL1 because they are not bundling identity assertions with authentication information. This characterization is true for both the authorization code and implicit client types. 
 
-Typically, OpenID Connect Providers interact with OAuth relying parties by providing an authentication mechanism which is separate from the transfer of personally identifiable information. As such, these providers can safely operate at FAL1 because they are not bundling identity assertions with authentication information.
+If the ID Token contains personally identifiable information, it must be encrypted to the RP at FAL2. This is accomplished by using the JSON Web Encryption (JWE) specification and a key registered to the client. 
 
-#### 6.3 Personal Identity Verification (PIV) card 
+OpenID Connect could reach FAL3 by providing a claim within the ID Token that references a cryptographic key to be presented by the user. 
 
-Federation Assurance Levels are independent of Authenticator Assurance Levels. Any authentication device may be used to obtain any FAL, including but not limited to a Personal Identity Verification (PIV) card.
+#### 5.3 Personal Identity Verification (PIV) Card 
+
+PIV cards are considered an authentication technology by the SP 800-63 guidelines, and not a federation technology. However, PIV cards can be used to authenticate to an IdP and start a federation transaction. This approach allows the complex processing and validation of the PIV certificate change to be handled by a specialized security component, the IdP, and identity information be sent to the downstream RPs by the federation protocol. 
+
+FALs are independent of AALs, and any authentication device may be used to start a federation transaction at any FAL, including but not limited to a PIV card. Therefore, the use of a PIV does not guarantee a high FAL.
 
 There are many benefits to using federated identity management as opposed to requiring independent registration of PIV cards for each user. Federated identity management protocols such as OpenID Connect allow users to authenticate at a relying party regardless of which authenticator they use at their IdP. This allows relying parties to securely accept registered users whose IdPs do not use PIV cards.
 
+#### 5.4 Privacy-enhancing Federated Identity
 
-#### 6.4 Privacy-enhancing Federated Identity
+In many cases, relying parties do not need to know the full identity of a user. Relying parties should only request as much information as they need to complete the transaction requested by the user, and IdPs should limit what information relying parties have access to within a transaction. Furthermore, with protocols like OpenID Connect, the attributes of the user can be sent separately from the assertion itself, limiting leakage of this information. 
 
-In many cases, relying parties do not need to know the full identity of a user. Relying parties should only request as much information as they need to complete the transaction requested by the user.
+Pairwise identifiers should be used in place of perisistent or correlatable identifiiers whenever possible. This limits relying parties in attempts of tracking or identifying individual users across different systems. 
 
-Pairwise identifiers should be used in place of perisistent or correlatable identifiiers whenever possible. This prevents relying parties from tracking or identifying individual users.
+When possible, claim references should be used to communicate identity information rather than raw data. For example, if a relying party needs to know whether a user is over eighteen years old, the IdP should respond that the user is over eighteen without sharing the user's age or birthdate.
 
-When possible, claims should be used to communicate identity information rather than raw data. For example, if a relying party needs to know whether a user is over eighteen years old, the IdP should respond that the user is over eighteen without sharing the user's age or birthdate.
+#### 5.5 Parallel Authentication
 
-#### 6.5 Parallel Authentication
+In some cases a relying party may wish to confirm certain aspects of a user's identity above and beyond what the IdP provides. For example, a relying party could verify a user with an IdP, receive a picture of the user, and require that an in-person agent verify that the picture matches the identity of the person authenticating. This use case is known as "parallel authentication" because two authentication events are happening in parallel. The focus of FAL is primary on the assertions being passed from the IdP to the RP, so most authentication events occuring at the RP would not affect the FAL of the transaction. 
 
-In some cases a relying party may wish to confirm certain aspects of a user's identity above and beyond what the IdP provides. For example, a relying party could verify a user with an IdP, receive a picture of the user, and require that an in-person agent verify that the picture matches the identity of the person authenticating.
-
-We call this use case "parallel authentication" because two authentication events are happening in parallel. The focus of FAL is primary on the assertions being passed from the IdP to the RP, so most authentication events occuring at the RP would not affect the FAL of the transaction. The exception to this rule is a holder-of-key authentication event. If the RP verifies in parallel that the user is in possession of a key that the IdP says they should have, that verification counts as a factor toward FAL3.
+For holder-of-key transactions, the parallel authentication event occurs by verifying both the assertion from the IdP as well as the user's presentation of proof of their personal key attested to in the assertion. 
 
 ### 7. Brokered Identity Management
 
