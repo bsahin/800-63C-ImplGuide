@@ -59,57 +59,67 @@ The additional information management and implementation complexity of higher FA
 
 Because it is the front door to many critical systems, authentication is a key piece of risk management strategy. Strong federation can protect against many potential user impersonation and man-in-the-middle attacks. Instead of each RP needing to manage user accounts and credentials separately, creating many vulnerable surfaces, federation concentrates the key security practices in a dedicated component, the IdP. Upgrades to credentials, software, and practices at the IdP automatically benefit the downstream RPs and the overall network. 
 
-### 4. Guidance for Relying Parties
+### 3. Guidance for Relying Parties
 
-Relying parties need to validate a variety of elements during a federated transaction. Because relying parties depend on endpoints that are open to the internet, it is essential that they verify the origin and validity of the information that they recieve.
+While it is the responsibility of the IdP to provide strong and trustworthy federation assertions, relying parties need to validate the elements of an assertion during a federated transaction. 
 
-#### 4.1 Purpose
+#### 3.1. Purpose
 
-Relying parties can be a valuable target for attackers to impersonate valid users or gain valuable information about them. If relying parties do not check the validity of the information they receive, attackers can gain valuable access. The security of the entire ecosystem is dependent upon the security of relying parties.
+Relying parties can be a valuable target for attackers to impersonate valid users or gain valuable information about them. If relying parties do not check the validity of the information they receive, attackers can gain access to the various services that users are logging in to. 
 
-#### 4.2 General Guidance
+If all of these checks are performed properly, the compromise of a single relying party does not threaten the rest of the network. This is in contrast to systems with individual credentials at each site, where the theft of a user's password from one site often leads to the compromise of other sites in the network due to password reuse. 
 
-Relying parties need to validate IdP signatures, assertion expirations, and audience parameters. Additionally, RPs need to test that these validation checks are working at all times because there will be no outward indication that something is wrong with the system until an attack occurs.
+#### 3.2. General Guidance
 
-##### 4.2.1 Validating IdP Signatures
+Relying parties need to validate IdP signatures, assertion expirations, and audience parameters. Additionally, RPs need to test that these validation checks are working at all times because there will be no outward indication that something is wrong with the system until an attack occurs. Relying parties must also verify the origin of the information that they recieve, as an attacker might try to inject a valid assertion from another user in order to take over an account. 
 
-An identity assertion is signed by an IdP so that it cannot be forged by an attacker. The IdP is the only entity with access to its private key, so a valid signature indicates that the assertion is from the IdP itself and not an attacker. If an RP does not check the validity of the IdP signature, attackers will be able to forge identity assertions, and gain access to protected systems without authorization. 
+##### 3.2.1. Validating IdP Signatures
 
-It is critically important to check whether your RP will accept unsigned assertions or assertions signed with an invalid key. Properly authorized transactions will still work even if an RP isn't checking assertion signatures, so there is no outward indication of a problem in the system. There will be no error messages or login failures to indicate that something is wrong.
+At all FALs, an identity assertion is signed by an IdP so that it cannot be forged by an attacker. The IdP is the only entity with access to its private key, so a valid signature indicates that the assertion is from the IdP itself and not an attacker. If an RP does not check the validity of the IdP signature, attackers will be able to forge identity assertions and gain access to protected systems without authorization. Additionally, if the relying party does not check the signature, an attacker could modify an otherwise valid assertion in transit, associating attributes and access rights to the current user. 
 
-##### 4.2.2 Checking Assertion Expirations
+Some protocols cover the entire assertion with a signature, while others cover only portions of it. The relying party must take care to not accept unsigned portions of the assertion as validated even when presented alongside a signed assertion.
 
-Federated identity assertions are intended to be short-lived. An identity assertion which expires quickly makes it difficult for attackers to misuse the assertion. It also ensures that any identity or authorization information included in the assertion is not out-of-date. Authorized transactions can occur at an RP that is not checking assertion expirations, but that RP will be significantly less secure. Always test your system with an expired assertion to make sure that it is not accepted as valid by the RP.
+The RP needs to make sure it is using the correct key for the claimed IdP, especially if the RP accepts assertions from multiple IdPs. In OpenID Connect, for example, the IdP is identified by the "iss" field of the ID Token's payload, and the signing key is identified by the "kid" field in the ID Token's header. The RP should accept the token if and only if the signature validates using the identified key from the identified issuer, and then only if the issuer is trusted to provide identities to this RP.
 
-##### 4.2.3 Checking Audience Parameters
+Testing whether RPs will reject unsigned assertions or assertions with invalid signatures is critical and not obvious. Properly authorized transactions will still work even if an RP isn't checking assertion signatures, since the RP will accept the (valid) assertion whether or not it has a valid signature. Therefore, in such cases there is no outward indication of a problem in the system and there will be no error messages or login failures to indicate that something is wrong. Only a failure from a negative test -- that is to say, the explicit rejection of an unsigned assertion or an assertion with an invalid signature -- will indicate that a relying party is properly checking keys and signatures.
 
-When an IdP creates an assertion, it includes an audience parameter indicating which RP requested the assertion. This parameter is intended to reduce fraud by making it obvious when an attacker is replaying an assertion at a different RP. 
+##### 3.2.2. Checking Assertion Expirations
 
-If an RP does not check for a matching audience parameter, it is possible for an attacker to get a valid assertion from any RP registered with the IdP, and replay it to gain unauthorized access to a different RP.
+Federated identity assertions are intended to be short-lived, since they are used to establish a session at the RP. An identity assertion which expires quickly makes it difficult for attackers to misuse the assertion. It also ensures that any identity or authorization information included in the assertion is not out-of-date. An RP that is not checking assertion expirations will still accept an unexpired assertion, so always test your system with an expired assertion to make sure that it is not accepted as valid by the RP. 
 
-It is critically important to check whether your RP will accept assertions with a missing or incorrect audience parameter. Properly authorized transactions will still work even if an RP isn't checking audience parameters, so there is no outward indication of a problem in the system. There will be no error messages or login failures to indicate that something is wrong.
+Since federation assertions are passed between different systems on the network, it is reasonable to allow a small amount of padding to the time checks to account for clock skew. This skew should be very short, such as a few seconds, so as to not inadvertently open the attacker's window for using expired assertions. A time synchronization protocol should be used on all systems on the network if possible to ensure the system clocks are as accurate as possible. 
 
-#### 4.3 Guidance by Product Family
+Some assertions also contain a timestamp indicating when the assertion was issued, and an RP should not accept any assertion that claims to have been issued in the future. Some assertions will also have a timestamp indicating when the assertion is not to be used before, which an RP should process to ensure it is not accepting an assertion too early. The use of the "not-before" processing mechanism is relatively rare in modern federation protocols. 
 
-There are two main product families that enable federated identity transactions - SAML and OAuth/OpenID Connect.
+##### 3.2.3. Checking Audience Parameters
 
-##### 4.3.1 SAML
+When an IdP creates an assertion, it includes an audience parameter indicating which RP requested the assertion. By checking the audience field, an RP can detect when an attacker is presenting an assertion intended for a different RP.
+
+If an RP does not check for a matching audience parameter, it is possible for an attacker to get a valid assertion from any RP registered with the IdP and replay it at the target RP to gain unauthorized access.
+
+An RP that isn't checking audience parameters will still accept a valid authorization with no outward indication of a problem. Therefore, it is important to test the RP with an assertion containing an errant or missing audience field. 
+
+#### 3.3. Guidance by Product Family
+
+This document covers two main product families that enable federated identity transactions - SAML and OAuth/OpenID Connect.
+
+##### 3.3.1. SAML
 
 Be careful about passing and validating metadata. Incorrectly communicated or configured metadata could leak information about a user that was not approved for distribution. Metadata that is not validated could have been tampered with by an attacker to gain access to valuable personal information.
 
 Always check certificates before accepting identity assertions. Attackers can forge certificates and phish users in an attempt to impersonate them. 
 
-##### 4.3.2 OAuth and OpenID Connect
+##### 3.3.2. OpenID Connect
 
 Different OAuth grant types or "flows" are appropriate for different kinds of applications at different FALs.
 
-The authorization code flow should be used whenever possible. It is the most common and most secure way to implement OAuth. It can accomodate all three FALs depending on the exact configuration of the application.
+The authorization code flow should be used whenever possible, particularly for web server, native, or mobile applications. It is the most common and most secure way to implement OAuth, the underlying protocol of OpenID Connect. It can accomodate all three FALs depending on the exact configuration of the application. 
+
+If the application is a native or mobile application, it should use the PKCE extension or dynamic client registration to ensure that different copies of the client software can't impersonate each other at the IdP. 
 
 The implicit grant type is appropriate for applications which are implemented entirely in front-end code and have to capability to store secrets outside of the user's web browser. The lack of ability to store secrets means that these sorts of applications can only function at FAL1 because they have no method of private key management which would enable encryption of identity assertions.
 
-The client credentials grant type is not recommended, since it does not require user interaction. Because applications using this grant type are capable of securely storing keys, these applications can function at FAL1 and FAL2. However, since no user interaction takes place during the authentication event, a holder-of-key proof cannot occur, preventing these sorts of applications from functioning at FAL3.
-
-The resource owner credentials grant type does not qualify for FAL1, FAL2, or FAL3, and should be avoided.
+The hybrid grant types are allowable only if all appropriate checks are made by the RP as defined in the standard. The client credentials and resource owner credentials grant types are not allowed at any FAL.
 
 ### 5. Guidance for Identity Providers
 
