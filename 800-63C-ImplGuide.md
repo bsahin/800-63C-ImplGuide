@@ -113,33 +113,37 @@ Always check certificates before accepting identity assertions. Attackers can fo
 
 Different OAuth grant types or "flows" are appropriate for different kinds of applications at different FALs.
 
-The authorization code flow should be used whenever possible, particularly for web server, native, or mobile applications. It is the most common and most secure way to implement OAuth, the underlying protocol of OpenID Connect. It can accomodate all three FALs depending on the exact configuration of the application. 
-
-If the application is a native or mobile application, it should use the PKCE extension or dynamic client registration to ensure that different copies of the client software can't impersonate each other at the IdP. 
+The authorization code flow should be used whenever possible, particularly for web server, native, or mobile applications. It is the most common and most secure way to implement OAuth, the underlying protocol of OpenID Connect. It can accomodate all three FALs depending on the exact configuration of the application. The authorization code flow makes use of back channel assertion presentation, which reduces the attack surface of the RP significantly by sending the assertion directly from the IdP to the RP without an intermediary party touching it. The RP should authenticate itself when presenting the authorization code to the IdP. If the RP is a native or mobile application, it should use the PKCE extension or dynamic client registration to ensure that different copies of the client software can't impersonate each other at the IdP. 
 
 The implicit grant type is appropriate for applications which are implemented entirely in front-end code and have to capability to store secrets outside of the user's web browser. The lack of ability to store secrets means that these sorts of applications can only function at FAL1 because they have no method of private key management which would enable encryption of identity assertions.
 
 The hybrid grant types are allowable only if all appropriate checks are made by the RP as defined in the standard. The client credentials and resource owner credentials grant types are not allowed at any FAL.
 
-### 5. Guidance for Identity Providers
+### 4. Guidance for Identity Providers
 
-The security of all users rests on the security of their identity provider. The guidance below will indicate how to implement strong security.
+The identity provider is the one party in a federation network that can assert the presence and validity of users and their attributes. The security of all users rests on the security of their identity provider, and a compromise of the IdP could cascade to all downstream parties. As such, it is vitally important that the IdP be held to the highest of security standards in implementation and deployment. The nature of federation protocols allows the IdP to specialize in security in a way that benefits all RPs that connect to it.
 
-#### 5.1 Purpose
+#### 4.1. Purpose
 
-IdPs have the difficult task of keeping track of many RPs and deciding how much trust to bestow on each one. This guidance is intended to highlight best practices to accomplish that objective.
+As the lynchpin of security in a federation network, IdPs have the difficult task of keeping track of both users and RPs, and connecting them in a secure fashion with a federation protocol. 
 
-#### 5.2 General Guidance
+#### 4.2. General Guidance
 
-Much of the technical friction in identity transactions stems from IdPs which are built and configured in such a way that onboarding new RPs requires a significant amount of manual human intervention.
+IdPs manage the primary credentials and authentication processes for users in a federation. Guideance for managing such authentication can be found in the companion implementation guide for SP 800-63B.
 
-Much of this friction is removed when IdPs support known discovery mechanisms and simple registration.
+Much of the technical friction in setting up a federation stems from IdPs which are built and configured in such a way that onboarding new RPs requires a significant amount of manual human intervention. Much of this friction is removed when IdPs support automated discovery mechanisms and simple automated registration.
 
-#### 5.3 Guidance by Product Family
+IdPs must securely store all private key material. If the IdPs keys are compromised, an attacker could generate arbitrary assertions and impersonate any user on the network. 
 
-There are three main product families that enable federated identity transactions - SAML, OAuth/OpenID Connect, and Kerberos
+IdPs must securely store any symmetric secrets used by clients in a fashion that reduces the liklihood of their capture, such as by storing a hash of the secret instead of the secret itself. 
 
-##### 5.3.1 SAML
+IdPs should implement phishing-resistant technologies in user-facing pages and may want to consider the use of heuristic risk-based security for all connections.
+
+#### 4.3. Guidance by Product Family
+
+This document covers two main product families that enable federated identity transactions - SAML and OAuth/OpenID Connect.
+
+##### 4.3.1. SAML
 
 Publish metadata in a well-known location. While there is no widely accepted standard for SAML metadata exchange, it is advisable to use a well-documented metadata endpoint to serve your IdPs metadata in the form of a single XML file to any RP who wishes to consume it.
 
@@ -151,19 +155,19 @@ Apply best practices to protect user information. All SAML assertions containing
 
 Assertions containing only authentication information and no personally identifiable information do not need to encrypt their assertions. They may operate at FAL1.
 
-##### 5.3.2 OAuth and OpenID Connect
+##### 4.3.2. OpenID Connect
 
-OpenID Connect has an established discovery mechanism. Your IdP's discovery documents should be published in JSON format at an HTTPS location ending in /.well-known/openid-configuration as specified in the OpenID Connect discovery specification.
+IdPs should use OpenID Connect's discovery mechanism, published in JSON format at an HTTPS location ending in /.well-known/openid-configuration as specified in the OpenID Connect discovery specification. This document contains all of the information that an RP would need to interact with the server. This document should be available in a well-documented location based on the IdP's issuer URL.
 
-If personally identifiable information is made available at the UserInfo endpoint, it need not be encrypted. However, if personally identifiable information is bundled with authentication information in a token, it must be encrypted to the RP and conformant with FAL2.
+If personally identifiable information is bundled with authentication information in a token, it must be encrypted to the RP and conformant with FAL2. If personally identifiable information is made available at the UserInfo endpoint, it need not be encrypted as a message but must be passed over a secure encrypted channel.
 
 It is recommended that OpenID Connect IdPs support a registration endpoint to make it easy for RPs to register without manual intervention.
 
 There is a test suite for OpenID Connect providers to verify whether their instance of OpenID Connect is compliant with the standard. That test is located at [http://openid.net/certification/testing/](http://openid.net/certification/testing/). If your provider passes these tests, you have the option of becoming a self-certified OpenID Connect provider. This will help other participants in the OpenID Connect ecosystem find you, and find out the exact configuration of your system.
 
-The OpenID Connect community has reviewed libraries in several different languages to search for bugs and non-compliant processes.Whenever possible, you should leverage [these libraries](http://openid.net/developers/libraries/) in your development.
+The OpenID Connect community has reviewed libraries in several different languages to search for bugs and non-compliant processes. Whenever possible, you should leverage these libraries in your development, available at [http://openid.net/developers/libraries/](http://openid.net/developers/libraries/).
  
-OpenID Connect relies heavily on the [JOSE standard](https://datatracker.ietf.org/wg/jose/about/), particularly JWT and JWK. All tokens an keys in your implementation should conform to those standards.
+OpenID Connect relies heavily on the [JOSE standard](https://datatracker.ietf.org/wg/jose/about/), particularly JWT and JWK. All tokens an keys in your implementation should conform to those standards. It is recommended that IdPs use an established JOSE and JWT library to ensure all appropriate checks have been made during implementation. 
 
 You may also consider implementation of additional security standards like [token binding](https://datatracker.ietf.org/wg/tokbind/documents/) and [proof key for code exchange](https://tools.ietf.org/html/rfc7636). While those standards are not factors in determining the FAL of your instance, they considered to be best practice in the industry.
 
