@@ -207,9 +207,9 @@ In some cases a relying party may wish to confirm certain aspects of a user's id
 
 For holder-of-key transactions, the parallel authentication event occurs by verifying both the assertion from the IdP as well as the user's presentation of proof of their personal key attested to in the assertion. 
 
-### 7. Brokered Identity Management
+### 6. Brokered Identity Management
 
-Some federated identity architectures are based on brokered identity management. In these architectures, a single broker intermediates transactions between registered IdPs and RPs. This means that each entity in the system only has to register with one broker in order to interoerate with everyone else in the system. It also means that an IdP can authenticate a user without knowledge of which RP requested the authentication event.
+Some federated identity architectures are based on brokered identity management, where a single broker intermediates transactions between registered IdPs and RPs. In this architecture, each entity in the system only has to register with one broker in order to interoerate with everyone else in the system. It also means that an IdP can authenticate a user without knowledge of which RP requested the authentication event.
 
 Recent advances in automated registration processes have made IdP/RP integrations much less onerous than they used to be. It is possible for an IdP and RP to register with each other in a very short amount of time without any manual processes. This has lessened the value of brokered identity architectures, since interoperability can be simple and fast even without a central broker.
 
@@ -219,7 +219,7 @@ Additionally, because brokers have access to active valid identity assertions, t
 
 NIST has been promoting privacy-enhancing technology in the brokered identity management space through the [Privacy-Enhanced Identity Federation project](https://nccoe.nist.gov/projects/building-blocks/privacy-enhanced-identity-brokers). This NIST building block outlines a set of goals which would constitute a new kind of brokered architecture. This architecture leverages a broker which cannot impersonate or track users. This architecture is still theoretical, and may allow for a privacy-preserving and secure version of brokered identity management in the future.
 
-### 8. Educational Resources
+### 7. Educational Resources
 
 All specifications for identity federation standards are freely available online:
 
@@ -237,16 +237,14 @@ The OpenID Foundation lists OpenID Connect security concerns [within the specifi
 
 OASIS has published [SAML Privacy and Security Considerations](http://docs.oasis-open.org/security/saml/v2.0/saml-sec-consider-2.0-os.pdf) and hosts a [mailing list](https://lists.oasis-open.org/archives/security-services/) to track SAML vulnerabilities.
 
-### 9. Communicating with Stakeholders
+### 8. Communicating with Stakeholders
 
-While it is tempting for stakeholders to request the highest level of security, that is not always in the best interest of the organization. Federated identity projects can be long and complicated. They can take resouces away from other work that a security team could be doing.
+Stakeholders should be aware that selecting an FAL is part of a larger risk- and resource-management process. While it is tempting for stakeholders to request the highest level of security, that is not always in the best interest of the organization. Federated identity projects can be long and complicated, and they can take resouces away from other work that a security team could be doing.
 
-Many organizations today operate at FAL1. FAL1 is the industry standard, and there are many libraries and off-the-shelf products that can help an organization implement an FAL1 conformant federated identity system.
+Many organizations today operate at FAL1, which is sufficient for most use cases. FAL1 is the industry standard, and there are many libraries and off-the-shelf products that can help an organization implement an FAL1 conformant federated identity system.
 
-Conformance to FAL2 or FAL3 is appropriate for some business cases where there is a risk of fraudulent activity which would be prevented by token encryption.
+Conformance to FAL2 or FAL3 is appropriate for some business cases where there is a risk of fraudulent activity which would be prevented by token encryption, or when the transactions protected by the login is of particularly high value to warrant the additional complexity.
 
-Stakeholders should be aware that selecting an FAL is part of a larger risk- and resource-management process.
-
-### 10. Conclusion
+### 9. Conclusion
 
 There are many ways to secure federated identity transactions, and many products do a very adequate job of it today, but there are ways to improve your security posture with regard to federation if doing so makes sense in your overall risk management framework.
