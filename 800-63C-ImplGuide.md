@@ -103,6 +103,10 @@ An RP that isn't checking audience parameters will still accept a valid authoriz
 
 Assertions need to be checked for uniqueness within their expiry windows to prevent an assertion from being replayed at the RP. An RP needs to check the unique identifiers within the assertion and accept each unique assertion only once to establish a login with the subscriber. If an assertion is seen multiple times by an RP, it should be considered stolen and therefore be rejected. 
 
+##### 3.2.5. Retrieving IdP Keys
+
+The RP can trust the assertion's signature only as much as it can trust that the keys used to verify the signature are associated with the IdP. The keys must be retrieved in a secure fashion, such as over an authenticated protected channel or pre-placed by a systems administrator. Only the keys identified in the transaction for a specific IdP should be used to evaluated the signature of an assertion.
+
 #### 3.3. Guidance by Product Family
 
 This document covers two main product families that enable federated identity transactions - SAML and OpenID Connect (which is built on top of OAuth).
@@ -138,6 +142,8 @@ IdPs manage the primary authenticators and authentication processes for users in
 Much of the technical friction in setting up a federation stems from IdPs which are built and configured in such a way that onboarding new RPs requires a significant amount of manual human intervention. Much of this friction is removed when IdPs support automated discovery mechanisms and simple automated registration.
 
 IdPs must securely store all private key material. If the IdPs keys are compromised, an attacker could generate arbitrary assertions and impersonate any user on the network. 
+
+IdPs must use approved cryptographic systems to generate all key material. Public keys need to be made available to RPs over authenticated protected channels or via trusted out of band processes, such as hand configuration by a systems administrator.
 
 IdPs must securely store any symmetric secrets used by clients in a fashion that reduces the likelihood of their capture, such as by storing a hash of the secret instead of the secret itself. 
 
