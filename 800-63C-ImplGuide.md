@@ -33,7 +33,7 @@
 
 ### 1. Introduction
 
-Federated identity transactions allow for a more secure and more usable internet by allowing users to have a smaller number of accounts that can be used across many sites and applications, without sharing credentials. There are several major protocols that enable federation transactions, and a multitude of software packages and libraries that implement them. This document outlines what to look for in software that enables federation and how to apply that.
+Federated identity transactions allow for a more secure and more usable internet by allowing users to have a smaller number of accounts that can be used across many sites and applications, without establishing shared authenticators at these sites and applications. There are several major protocols that enable federation transactions, and a multitude of software packages and libraries that implement them. This document outlines what to look for in software that enables federation and how to apply that.
 
 This document is intended to provide more direct guidance than SP 800-63C, which was written to be intentionally technology-agnostic. While this choice makes the document applicable across a wide array of technologies and circumstances, the abstract nature can make it difficult for implementers to understand what was intended by the document with regard to specific protocols or products. This guide is intended to provide more concrete guidance. 
 
@@ -57,7 +57,7 @@ Selecting and conforming to an FAL should be part of a larger risk management pr
 
 The additional information management and implementation complexity of higher FALs cannot be ignored, and the costs to all involved must be weighed against perceived benefits. Unless there is a compelling reason to use the features of higher FALs, FAL1 should be the default for most use cases. FAL1 is the industry standard for authentication at this point in time. The risks of implementing a system at FAL1, when compared to higher FALs, may be negligible depending on relevant use cases and attack vectors. When PII needs to be passed, it should be passed in a secondary channel where possible instead of in the assertion itself, regardless of the FAL.
 
-Because it is the front door to many critical systems, authentication is a key piece of risk management strategy. Strong federation can protect against many potential user impersonation and man-in-the-middle attacks. Instead of each RP needing to manage user accounts and credentials separately, creating many vulnerable surfaces, federation concentrates the key security practices in a dedicated component, the IdP. Upgrades to credentials, software, and practices at the IdP automatically benefit the downstream RPs and the overall network. 
+Because it is the front door to many critical systems, authentication is a key piece of risk management strategy. Strong federation can protect against many potential user impersonation and man-in-the-middle attacks. Instead of each RP needing to manage user accounts and authenticators separately, creating many vulnerable surfaces, federation concentrates the key security practices in a dedicated component, the IdP. Upgrades to authenticators, software, and practices at the IdP automatically benefit the downstream RPs and the overall network. 
 
 ### 3. Guidance for Relying Parties
 
@@ -67,7 +67,7 @@ While it is the responsibility of the IdP to provide strong and trustworthy fede
 
 Relying parties can be a valuable target for attackers to impersonate valid users or gain valuable information about them. If relying parties do not check the validity of the information they receive, attackers can gain access to the various services that users are logging in to. 
 
-If all of these checks are performed properly, the compromise of a single relying party does not threaten the rest of the network. This is in contrast to systems with individual credentials at each site, where the theft of a user's password from one site often leads to the compromise of other sites in the network due to password reuse. 
+If all of these checks are performed properly, the compromise of a single relying party does not threaten the rest of the network. This is in contrast to systems with individual authenticators at each site, where the theft of a user's password from one site often leads to the compromise of other sites in the network due to password reuse. 
 
 #### 3.2. General Guidance
 
@@ -121,7 +121,7 @@ The authorization code flow should be used whenever possible, particularly for w
 
 The implicit grant type is appropriate for applications which are implemented entirely in front-end code and have to capability to store secrets outside of the user's web browser. The lack of ability to store secrets means that these sorts of applications can only function at FAL1 because they have no method of private key management which would enable encryption of identity assertions.
 
-The hybrid grant types are allowable only if all appropriate checks are made by the RP as defined in the standard. The client credentials and resource owner credentials grant types are not allowed at any FAL.
+The hybrid grant types are allowable only if all appropriate checks are made by the RP as defined in the standard. The `client credentials` and `resource owner credentials` grant types are not allowed at any FAL.
 
 ### 4. Guidance for Identity Providers
 
@@ -133,7 +133,7 @@ As the lynchpin of security in a federation network, IdPs have the difficult tas
 
 #### 4.2. General Guidance
 
-IdPs manage the primary credentials and authentication processes for users in a federation. Guidance for managing such authentication can be found in the companion implementation guide for SP 800-63B.
+IdPs manage the primary authenticators and authentication processes for users in a federation. Guidance for managing such authentication can be found in the companion implementation guide for SP 800-63B.
 
 Much of the technical friction in setting up a federation stems from IdPs which are built and configured in such a way that onboarding new RPs requires a significant amount of manual human intervention. Much of this friction is removed when IdPs support automated discovery mechanisms and simple automated registration.
 
