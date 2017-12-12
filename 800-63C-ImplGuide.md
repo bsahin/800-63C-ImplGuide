@@ -105,7 +105,7 @@ Assertions need to be checked for uniqueness within their expiry windows to prev
 
 #### 3.3. Guidance by Product Family
 
-This document covers two main product families that enable federated identity transactions - SAML and OAuth/OpenID Connect.
+This document covers two main product families that enable federated identity transactions - SAML and OpenID Connect (which is built on top of OAuth).
 
 ##### 3.3.1. SAML
 
