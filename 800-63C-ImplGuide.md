@@ -197,7 +197,7 @@ OpenID Connect could reach FAL3 by providing a claim within the ID Token that re
 
 #### 5.3 Personal Identity Verification (PIV) Card 
 
-PIV cards are considered an authentication technology by the SP 800-63 guidelines, and not a federation technology. However, PIV cards can be used to authenticate to an IdP and start a federation transaction. This approach allows the complex processing and validation of the PIV certificate change to be handled by a specialized security component, the IdP, and identity information be sent to the downstream RPs by the federation protocol. 
+PIV cards are considered an authentication technology by the SP 800-63 guidelines, and not a federation technology. However, PIV cards can be used to authenticate to an IdP and start a federation transaction. This approach allows the complex processing and validation of the PIV certificate change to be handled by a specialized security component, the IdP, and identity information be sent to the downstream RPs by the federation protocol. The attributes contained in the PIV certificates can be transmitted by the IdP to the RP, assuming all consent and privacy considerations around attribute release have been followed as usual.
 
 FALs are independent of AALs, and any authentication device may be used to start a federation transaction at any FAL, including but not limited to a PIV card. Therefore, the use of a PIV does not guarantee a high FAL.
 
