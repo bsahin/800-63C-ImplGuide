@@ -33,7 +33,7 @@
 
 ### 1. Introduction
 
-Federated identity transactions allow for a more secure and more usable internet by allowing users to have a smaller number of accounts that can be used across many sites and applications, without establishing shared authenticators at these sites and applications. There are several major protocols that enable federation transactions, and a multitude of software packages and libraries that implement them. This document outlines what to look for in software that enables federation and how to apply that.
+Federated identity transactions allow for a more secure and more usable internet by allowing users to have a smaller number of accounts that can be used across many sites and applications, without using the same authenticator at multiple sites or applications. There are several major protocols that enable federation transactions, and a multitude of software packages and libraries that implement them. This document outlines what to look for in software that enables federation and how to apply that.
 
 This document is intended to provide more direct guidance than SP 800-63C, which was written to be intentionally technology-agnostic. While this choice makes the document applicable across a wide array of technologies and circumstances, the abstract nature can make it difficult for implementers to understand what was intended by the document with regard to specific protocols or products. This guide is intended to provide more concrete guidance. 
 
@@ -101,11 +101,11 @@ An RP that isn't checking audience parameters will still accept a valid authoriz
 
 ##### 3.2.4. Checking Assertion Uniqueness
 
-Assertions need to be checked for uniqueness within their expiry windows to prevent an assertion from being replayed at the RP. An RP needs to check the unique identifiers within the assertion and accept each unique assertion only once to establish a login with the subscriber. If an assertion is seen multiple times by an RP, it should be considered stolen and therefore be rejected. 
+An attacker that gains possession of a bearer assertion could try to replay that assertion at an RP in order to take over a user's session. To prevent this, an IdP is required to make each assertion unique. The RP consequently needs to check the assertion for uniqueness within the assertion's expiry window by checking any unique identifiers within the assertion and accepting each unique assertion identifier only once to establish a login with the subscriber. If an assertion is seen multiple times by an RP, especially from multiple connections, the RP can consider this assertion stolen. The RP should remember the identifiers of assertions 
 
 ##### 3.2.5. Retrieving IdP Keys
 
-The RP can trust the assertion's signature only as much as it can trust that the keys used to verify the signature are associated with the IdP. The keys must be retrieved in a secure fashion, such as over an authenticated protected channel or pre-placed by a systems administrator. Only the keys identified in the transaction for a specific IdP should be used to evaluated the signature of an assertion.
+The RP can trust the assertion's signature only as much as it can trust that the keys used to verify the signature are associated with the IdP. The keys must be retrieved in a secure fashion, such as over an authenticated protected channel or pre-placed by a systems administrator. Only the keys identified in the transaction for a specific IdP should be used to evaluate the signature of an assertion.
 
 #### 3.3. Guidance by Product Family
 
