@@ -33,7 +33,7 @@
 
 ### 1. Introduction
 
-Federated identity transactions allow for a more secure and more usable internet by allowing users to have a smaller number of accounts that can be used across many sites and applications, without sharing credentials. There are several major protocols that enable federation transactions, and a multitude of software packages and libraries that implement them. This document outlines what to look for in software that enables federation and how to apply that.
+Federated identity transactions allow for a more secure and more usable internet by allowing users to have a smaller number of accounts that can be used across many sites and applications, without using the same authenticator at multiple sites or applications. There are several major protocols that enable federation transactions, and a multitude of software packages and libraries that implement them. This document outlines what to look for in software that enables federation and how to apply that.
 
 This document is intended to provide more direct guidance than SP 800-63C, which was written to be intentionally technology-agnostic. While this choice makes the document applicable across a wide array of technologies and circumstances, the abstract nature can make it difficult for implementers to understand what was intended by the document with regard to specific protocols or products. This guide is intended to provide more concrete guidance. 
 
@@ -43,21 +43,21 @@ Different federation protocols and implementations of those protocols have many 
 
 ### 2.1. Selecting a Federation Assurance Level (FAL)
 
-The Federation Assurance Level (FAL) defined in SP 800-63C provides a set of requirements for federation transactions. These requirements are grouped into an ascending scale of three levels: FAL1, FAL2, and FAL3. Each sucessive level includes all the features of lower levels and adds additional requirements on top of them. 
+The Federation Assurance Level (FAL) defined in SP 800-63C provides a set of requirements for federation transactions. These requirements are grouped into an ascending scale of three levels: FAL1, FAL2, and FAL3. Each successive level includes all the features of lower levels and adds additional requirements on top of them. 
 
-FAL1 provides a solid basis for federation and is appropriate for the vast majority of use cases. Most off-the-shelf products operate at FAL1 today without additional features. Most common deployments of SAML and OpenID Connect fulfill all the requirements of FAL1 today. FAL1 requires that all assertions be signed, time limited, and audience-restricted to prevent an assertion from being replayed between relying parties. While assertions at FAL1 can't contain personally identifiable information, such information can still be transmitted to the RP via a secondary channel and still be compliant with FAL1. For example, in OpenID Connect the ID Token serves as the assertion, and by default it contains a non-PII subject identifier for the user. Additional information about the user can be obtained through the UserInfo Endpoint by using an OAuth access token. Since this information is communicated directly from the IdP to the RP over a an encrypted channel, it need not be separately encrypted. 
+FAL1 provides a solid basis for federation and is appropriate for the vast majority of use cases. Most off-the-shelf products operate at FAL1 today without additional features. Most common deployments of SAML and OpenID Connect fulfill all the requirements of FAL1 today. FAL1 requires that all assertions be signed, time limited, and audience-restricted to prevent an assertion intended for one relying party to be replayed at another. While assertions at FAL1 can't contain personally identifiable information, such information can still be transmitted to the RP via a secondary channel and still be compliant with FAL1. For example, in OpenID Connect the ID Token serves as the assertion, and by default it contains a non-PII subject identifier for the user. Additional information about the user can be obtained through the UserInfo Endpoint by using an OAuth access token. Since this information is communicated in the back channel from the IdP to the RP over a an authenticated protected channel, it need not be separately encrypted as it is not handled or presented by an intermediary party.
 
-FAL2 provides an extra layer of security by requiring that the assertion be encrypted so that the RP is the only party that can decrypt it. This protection is required if personally identifiable information will be sent in an identity assertion, as personally identifiable information must always be encrypted in transit and an assertion is often borne by intermediate parties in a transaction. This level reqires that the IdP manage an encryption key for the RP, which necessitates additional complexity for both parties. The keys could be managed with a traditional PKI infrstructure that relies on a trusted certificate authority, but with many protocols the keys can be instead registered directly between parties. The RP also needs to manage and protect its decryption keys in order to read the information in the assertion. If these keys are leaked to another party, the additional protections provided by FAL2 no longer apply. PII can still be sent in a secondary channel. 
+FAL2 provides an extra layer of security by requiring that the assertion be encrypted so that the RP is the only party that can decrypt it. This protection is required if personally identifiable information will be sent in an identity assertion, as personally identifiable information must always be encrypted in transit and an assertion is often borne by intermediate parties in a transaction. This level requires that the IdP manage an encryption key for the RP, which necessitates additional complexity for both parties. The keys could be managed with a traditional PKI infrastructure that relies on a trusted certificate authority, but with many protocols the keys can be instead registered directly between parties. The RP also needs to manage and protect its decryption keys in order to read the information in the assertion. If these keys are leaked to another party, the additional protections provided by FAL2 no longer apply. PII can still be sent in a secondary channel. 
 
-FAL3 is intended to be forward-looking and is not yet available in off-the-shelf standards and products. FAL3 provides an additional layer in the form of a cryptographic key that must be presented by the user in addition to the signed and encrypted assertion itself. This level requires that the IdP manage references to keys representing the user at each RP in addition to managing the keys for the RPs themselves. The IdP needs to correctly associate the user's key to the correct RP in the assertion, and the RP needs to be able to process and validate the presentation of the key by the user.
+FAL3 is intended to be forward-looking and is not yet readily available in off-the-shelf standards and products. FAL3 provides an additional layer in the form of a cryptographic key that must be presented by the user in addition to the signed and encrypted assertion itself. This level requires that the IdP manage references to keys representing the user at each RP in addition to managing the keys for the RPs themselves. The IdP needs to correctly associate the user's key to the correct RP in the assertion, and the RP needs to be able to process and validate the presentation of the key by the user. This key could be the same key that's presented by the user at the IdP, such as an X.509 certificate, or it could be a separate key with no identity information associated with it that's not used at the IdP, such as a FIDO token. In both cases, the assertion needs to reference the key and the RP needs to ensure the correct key is presented by the user.
 
 ### 2.2. Risk Management
 
-Selecting and conforming to an FAL should be part of a larger risk management process and program. Conforming to FAL3 does not make your organization's security infallible, but instead provides protection against particular attacks while incurring certain costs to both the applications and the users. Rather than attempting to make your federation infrastructure conform to the highest standards available, you should analyze the risks that are inherent in your organization and choose how strongly to protect against them given their severity and liklihood of occurance.
+Selecting and conforming to an FAL should be part of a larger risk management process and program. Conforming to FAL3 does not make your organization's security infallible, but instead provides protection against particular attacks while incurring certain costs to both the applications and the users. Rather than attempting to make your federation infrastructure conform to the highest standards available, you should analyze the risks that are inherent in your organization and choose how strongly to protect against them given their severity and likelihood of occurrence.
 
 The additional information management and implementation complexity of higher FALs cannot be ignored, and the costs to all involved must be weighed against perceived benefits. Unless there is a compelling reason to use the features of higher FALs, FAL1 should be the default for most use cases. FAL1 is the industry standard for authentication at this point in time. The risks of implementing a system at FAL1, when compared to higher FALs, may be negligible depending on relevant use cases and attack vectors. When PII needs to be passed, it should be passed in a secondary channel where possible instead of in the assertion itself, regardless of the FAL.
 
-Because it is the front door to many critical systems, authentication is a key piece of risk management strategy. Strong federation can protect against many potential user impersonation and man-in-the-middle attacks. Instead of each RP needing to manage user accounts and credentials separately, creating many vulnerable surfaces, federation concentrates the key security practices in a dedicated component, the IdP. Upgrades to credentials, software, and practices at the IdP automatically benefit the downstream RPs and the overall network. 
+Because it is the front door to many critical systems, authentication is a key piece of risk management strategy. Strong federation can protect against many potential user impersonation and man-in-the-middle attacks. Instead of each RP needing to manage user accounts and authenticators separately, creating many vulnerable surfaces, federation concentrates the key security practices in a dedicated component, the IdP. Upgrades to authenticators, software, and practices at the IdP automatically benefit the downstream RPs and the overall network. 
 
 ### 3. Guidance for Relying Parties
 
@@ -67,11 +67,11 @@ While it is the responsibility of the IdP to provide strong and trustworthy fede
 
 Relying parties can be a valuable target for attackers to impersonate valid users or gain valuable information about them. If relying parties do not check the validity of the information they receive, attackers can gain access to the various services that users are logging in to. 
 
-If all of these checks are performed properly, the compromise of a single relying party does not threaten the rest of the network. This is in contrast to systems with individual credentials at each site, where the theft of a user's password from one site often leads to the compromise of other sites in the network due to password reuse. 
+If all of these checks are performed properly, the compromise of a single relying party does not threaten the rest of the network. This is in contrast to systems with individual authenticators at each site, where the theft of a user's password from one site often leads to the compromise of other sites in the network due to password reuse. 
 
 #### 3.2. General Guidance
 
-Relying parties need to validate IdP signatures, assertion expirations, and audience parameters. Additionally, RPs need to test that these validation checks are working at all times because there will be no outward indication that something is wrong with the system until an attack occurs. Relying parties must also verify the origin of the information that they recieve, as an attacker might try to inject a valid assertion from another user in order to take over an account. 
+Relying parties need to validate IdP signatures, assertion expirations, and audience parameters. Additionally, RPs need to test that these validation checks are working at all times because there will be no outward indication that something is wrong with the system until an attack occurs. Relying parties must also verify the origin of the information that they receive, as an attacker might try to inject a valid assertion from another user in order to take over an account. 
 
 ##### 3.2.1. Validating IdP Signatures
 
@@ -97,11 +97,19 @@ When an IdP creates an assertion, it includes an audience parameter indicating w
 
 If an RP does not check for a matching audience parameter, it is possible for an attacker to get a valid assertion from any RP registered with the IdP and replay it at the target RP to gain unauthorized access.
 
-An RP that isn't checking audience parameters will still accept a valid authorization with no outward indication of a problem. Therefore, it is important to test the RP with an assertion containing an errant or missing audience field. 
+An RP that isn't checking audience parameters will still accept a valid authorization with no outward indication of a problem. Therefore, it is important to test the RP with an assertion containing an errant or missing audience field.
+
+##### 3.2.4. Checking Assertion Uniqueness
+
+An attacker that gains possession of a bearer assertion could try to replay that assertion at an RP in order to take over a user's session. To prevent this, an IdP is required to make each assertion unique. The RP consequently needs to check the assertion for uniqueness within the assertion's expiry window by checking any unique identifiers within the assertion and accepting each unique assertion identifier only once to establish a login with the subscriber. If an assertion is seen multiple times by an RP, especially from multiple connections, the RP can consider this assertion stolen. The RP should remember the identifiers of assertions 
+
+##### 3.2.5. Retrieving IdP Keys
+
+The RP can trust the assertion's signature only as much as it can trust that the keys used to verify the signature are associated with the IdP. The keys must be retrieved in a secure fashion, such as over an authenticated protected channel or pre-placed by a systems administrator. Only the keys identified in the transaction for a specific IdP should be used to evaluate the signature of an assertion.
 
 #### 3.3. Guidance by Product Family
 
-This document covers two main product families that enable federated identity transactions - SAML and OAuth/OpenID Connect.
+This document covers two main product families that enable federated identity transactions - SAML and OpenID Connect (which is built on top of OAuth).
 
 ##### 3.3.1. SAML
 
@@ -117,7 +125,7 @@ The authorization code flow should be used whenever possible, particularly for w
 
 The implicit grant type is appropriate for applications which are implemented entirely in front-end code and have to capability to store secrets outside of the user's web browser. The lack of ability to store secrets means that these sorts of applications can only function at FAL1 because they have no method of private key management which would enable encryption of identity assertions.
 
-The hybrid grant types are allowable only if all appropriate checks are made by the RP as defined in the standard. The client credentials and resource owner credentials grant types are not allowed at any FAL.
+The hybrid grant types are allowable only if all appropriate checks are made by the RP as defined in the standard. The `client credentials` and `resource owner credentials` grant types are not allowed at any FAL.
 
 ### 4. Guidance for Identity Providers
 
@@ -129,13 +137,15 @@ As the lynchpin of security in a federation network, IdPs have the difficult tas
 
 #### 4.2. General Guidance
 
-IdPs manage the primary credentials and authentication processes for users in a federation. Guideance for managing such authentication can be found in the companion implementation guide for SP 800-63B.
+IdPs manage the primary authenticators and authentication processes for users in a federation. Guidance for managing such authentication can be found in the companion implementation guide for SP 800-63B.
 
 Much of the technical friction in setting up a federation stems from IdPs which are built and configured in such a way that onboarding new RPs requires a significant amount of manual human intervention. Much of this friction is removed when IdPs support automated discovery mechanisms and simple automated registration.
 
 IdPs must securely store all private key material. If the IdPs keys are compromised, an attacker could generate arbitrary assertions and impersonate any user on the network. 
 
-IdPs must securely store any symmetric secrets used by clients in a fashion that reduces the liklihood of their capture, such as by storing a hash of the secret instead of the secret itself. 
+IdPs must use approved cryptographic systems to generate all key material. Public keys need to be made available to RPs over authenticated protected channels or via trusted out of band processes, such as hand configuration by a systems administrator.
+
+IdPs must securely store any symmetric secrets used by clients in a fashion that reduces the likelihood of their capture, such as by storing a hash of the secret instead of the secret itself. 
 
 IdPs should implement phishing-resistant technologies in user-facing pages and may want to consider the use of heuristic risk-based security for all connections.
 
@@ -151,7 +161,7 @@ Only accept metadata that has been signed by the presenting RP, and always check
 
 Identity federations like InCommon share the metadata of hundreds of IdPs and RPs in a structured manner. Adding your IdP's metadata to such federations will help RPs to find it easily.
 
-Apply best practices to protect user information. All SAML assertions containing personally identifyable information must conform to FAL2. That means the assertion must be encrypted to the relying party.
+Apply best practices to protect user information. All SAML assertions containing personally identifiable information must conform to FAL2. That means the assertion must be encrypted to the relying party.
 
 Assertions containing only authentication information and no personally identifiable information do not need to encrypt their assertions. They may operate at FAL1.
 
@@ -159,7 +169,7 @@ Assertions containing only authentication information and no personally identifi
 
 IdPs should use OpenID Connect's discovery mechanism, published in JSON format at an HTTPS location ending in /.well-known/openid-configuration as specified in the OpenID Connect discovery specification. This document contains all of the information that an RP would need to interact with the server. This document should be available in a well-documented location based on the IdP's issuer URL.
 
-If personally identifiable information is bundled with authentication information in a token, it must be encrypted to the RP and conformant with FAL2. If personally identifiable information is made available at the UserInfo endpoint, it need not be encrypted as a message but must be passed over a secure encrypted channel.
+If personally identifiable information is bundled with authentication information in a token, it must be encrypted to the RP and conformant with FAL2. If personally identifiable information is made available at the UserInfo endpoint, it need not be encrypted as a message but must be passed over an authenticated protected channel.
 
 It is recommended that OpenID Connect IdPs support a registration endpoint to make it easy for RPs to register without manual intervention.
 
@@ -175,7 +185,7 @@ You may also consider implementation of additional security standards like [toke
 
 #### 5.1. Shibboleth and SAML
 
-SAML Federations like InCommon can operate at FAL1 or FAL2. Most InCommon IdPs are running on a Shibboleth identity provider. They pass assertions through a response to an authentication event. Most often, those assertions are not encrypted to the RP and therefore conform to FAL1 if they don't contain any personally identifiable information. If you are running a Shibboleth IdP, you must either encrypt your assertions to the RP, or refrain from sending personally identifiable information such as eppn over the wire as an unecrypted SAML assertion.
+SAML Federations like InCommon can operate at FAL1 or FAL2. Most InCommon IdPs are running on a Shibboleth identity provider. They pass assertions through a response to an authentication event. Most often, those assertions are not encrypted to the RP and therefore conform to FAL1 if they don't contain any personally identifiable information. If you are running a Shibboleth IdP, you must either encrypt your assertions to the RP, or refrain from sending personally identifiable information such as `eduPersonPrincipalName` (or `eppn`) over the wire as an unencrypted SAML assertion.
 
 #### 5.2 OpenID Connect
 
@@ -187,7 +197,7 @@ OpenID Connect could reach FAL3 by providing a claim within the ID Token that re
 
 #### 5.3 Personal Identity Verification (PIV) Card 
 
-PIV cards are considered an authentication technology by the SP 800-63 guidelines, and not a federation technology. However, PIV cards can be used to authenticate to an IdP and start a federation transaction. This approach allows the complex processing and validation of the PIV certificate change to be handled by a specialized security component, the IdP, and identity information be sent to the downstream RPs by the federation protocol. 
+PIV cards are considered an authentication technology by the SP 800-63 guidelines, and not a federation technology. However, PIV cards can be used to authenticate to an IdP and start a federation transaction. This approach allows the complex processing and validation of the PIV certificate change to be handled by a specialized security component, the IdP, and identity information be sent to the downstream RPs by the federation protocol. The attributes contained in the PIV certificates can be transmitted by the IdP to the RP, assuming all consent and privacy considerations around attribute release have been followed as usual.
 
 FALs are independent of AALs, and any authentication device may be used to start a federation transaction at any FAL, including but not limited to a PIV card. Therefore, the use of a PIV does not guarantee a high FAL.
 
@@ -197,19 +207,19 @@ There are many benefits to using federated identity management as opposed to req
 
 In many cases, relying parties do not need to know the full identity of a user. Relying parties should only request as much information as they need to complete the transaction requested by the user, and IdPs should limit what information relying parties have access to within a transaction. Furthermore, with protocols like OpenID Connect, the attributes of the user can be sent separately from the assertion itself, limiting leakage of this information. 
 
-Pairwise identifiers should be used in place of perisistent or correlatable identifiiers whenever possible. This limits relying parties in attempts of tracking or identifying individual users across different systems. 
+Pairwise identifiers should be used in place of persistent or correlatable identifiers whenever possible. This limits relying parties in attempts of tracking or identifying individual users across different systems. 
 
 When possible, claim references should be used to communicate identity information rather than raw data. For example, if a relying party needs to know whether a user is over eighteen years old, the IdP should respond that the user is over eighteen without sharing the user's age or birthdate.
 
 #### 5.5 Parallel Authentication
 
-In some cases a relying party may wish to confirm certain aspects of a user's identity above and beyond what the IdP provides. For example, a relying party could verify a user with an IdP, receive a picture of the user, and require that an in-person agent verify that the picture matches the identity of the person authenticating. This use case is known as "parallel authentication" because two authentication events are happening in parallel. The focus of FAL is primary on the assertions being passed from the IdP to the RP, so most authentication events occuring at the RP would not affect the FAL of the transaction. 
+In some cases a relying party may wish to confirm certain aspects of a user's identity above and beyond what the IdP provides. For example, a relying party could verify a user with an IdP, receive a picture of the user, and require that an in-person agent verify that the picture matches the identity of the person authenticating. This use case is known as "parallel authentication" because two authentication events are happening in parallel. The focus of FAL is primary on the assertions being passed from the IdP to the RP, so most authentication events occurring at the RP would not affect the FAL of the transaction. 
 
 For holder-of-key transactions, the parallel authentication event occurs by verifying both the assertion from the IdP as well as the user's presentation of proof of their personal key attested to in the assertion. 
 
 ### 6. Brokered Identity Management
 
-Some federated identity architectures are based on brokered identity management, where a single broker intermediates transactions between registered IdPs and RPs. In this architecture, each entity in the system only has to register with one broker in order to interoerate with everyone else in the system. It also means that an IdP can authenticate a user without knowledge of which RP requested the authentication event.
+Some federated identity architectures are based on brokered identity management, where a single broker intermediates transactions between registered IdPs and RPs. In this architecture, each entity in the system only has to register with one broker in order to interoperate with everyone else in the system. It also means that an IdP can authenticate a user without knowledge of which RP requested the authentication event.
 
 Recent advances in automated registration processes have made IdP/RP integrations much less onerous than they used to be. It is possible for an IdP and RP to register with each other in a very short amount of time without any manual processes. This has lessened the value of brokered identity architectures, since interoperability can be simple and fast even without a central broker.
 
@@ -227,7 +237,7 @@ All specifications for identity federation standards are freely available online
 [OpenID Connect](http://openid.net/connect/)  
 [Security Assertion Markup Language](http://saml.xml.org/saml-specifications)
 
-These specifications outline multiple, sometimes mutually exlusive ways to implement federated identity, so be sure to read the specifications in their entirety before creating an implementation.
+These specifications outline multiple, sometimes mutually exclusive ways to implement federated identity, so be sure to read the specifications in their entirety before creating an implementation.
 
 Federation standards communities actively track known vulnerabilities in existing standards. 
 
@@ -239,7 +249,7 @@ OASIS has published [SAML Privacy and Security Considerations](http://docs.oasis
 
 ### 8. Communicating with Stakeholders
 
-Stakeholders should be aware that selecting an FAL is part of a larger risk- and resource-management process. While it is tempting for stakeholders to request the highest level of security, that is not always in the best interest of the organization. Federated identity projects can be long and complicated, and they can take resouces away from other work that a security team could be doing.
+Stakeholders should be aware that selecting an FAL is part of a larger risk- and resource-management process. While it is tempting for stakeholders to request the highest level of security, that is not always in the best interest of the organization. Federated identity projects can be long and complicated, and they can take resources away from other work that a security team could be doing.
 
 Many organizations today operate at FAL1, which is sufficient for most use cases. FAL1 is the industry standard, and there are many libraries and off-the-shelf products that can help an organization implement an FAL1 conformant federated identity system.
 
