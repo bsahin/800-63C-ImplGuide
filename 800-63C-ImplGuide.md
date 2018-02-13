@@ -33,7 +33,7 @@
 
 ### 1. Introduction
 
-Federated identity transactions allow for a more secure and more usable internet by allowing users to have a smaller number of accounts that can be used across many sites and applications, without using the same authenticator at multiple sites or applications. There are several major protocols that enable federation transactions, and a multitude of software packages and libraries that implement them. This document outlines what to look for in software that enables federation and how to apply that.
+Federated identity transactions allow for a more secure and more usable internet by allowing subscribers to have a smaller number of accounts that can be used across many sites and applications, without using the same authenticator at multiple sites or applications. There are several major protocols that enable federation transactions, and a multitude of software packages and libraries that implement them. This document outlines what to look for in software that enables federation and how to apply that.
 
 This document is intended to provide more direct guidance than SP 800-63C, which was written to be intentionally technology-agnostic. While this choice makes the document applicable across a wide array of technologies and circumstances, the abstract nature can make it difficult for implementers to understand what was intended by the document with regard to specific protocols or products. This guide is intended to provide more concrete guidance. 
 
@@ -65,17 +65,17 @@ While it is the responsibility of the IdP to provide strong and trustworthy fede
 
 #### 3.1. Purpose
 
-Relying parties can be a valuable target for attackers to impersonate valid users or gain valuable information about them. If relying parties do not check the validity of the information they receive, attackers can gain access to the various services that users are logging in to. 
+Relying parties can be a valuable target for attackers to impersonate valid subscribers or gain valuable information about them. If relying parties do not check the validity of the information they receive, attackers can gain access to the various services that subscribers are logging in to. 
 
-If all of these checks are performed properly, the compromise of a single relying party does not threaten the rest of the network. This is in contrast to systems with individual authenticators at each site, where the theft of a user's password from one site often leads to the compromise of other sites in the network due to password reuse. 
+If all of these checks are performed properly, the compromise of a single relying party does not threaten the rest of the network. This is in contrast to systems with individual authenticators at each site, where the theft of a subscriber's password from one site often leads to the compromise of other sites in the network due to password reuse. 
 
 #### 3.2. General Guidance
 
-Relying parties need to validate IdP signatures, assertion expirations, and audience parameters. Additionally, RPs need to test that these validation checks are working at all times because there will be no outward indication that something is wrong with the system until an attack occurs. Relying parties must also verify the origin of the information that they receive, as an attacker might try to inject a valid assertion from another user in order to take over an account. 
+Relying parties need to validate IdP signatures, assertion expirations, and audience parameters. Additionally, RPs need to test that these validation checks are working at all times because there will be no outward indication that something is wrong with the system until an attack occurs. Relying parties must also verify the origin of the information that they receive, as an attacker might try to inject a valid assertion from another subscriber in order to take over an account. 
 
 ##### 3.2.1. Validating IdP Signatures
 
-At all FALs, an identity assertion is signed by an IdP so that it cannot be forged by an attacker. The IdP is the only entity with access to its private key, so a valid signature indicates that the assertion is from the IdP itself and not an attacker. If an RP does not check the validity of the IdP signature, attackers will be able to forge identity assertions and gain access to protected systems without authorization. Additionally, if the relying party does not check the signature, an attacker could modify an otherwise valid assertion in transit, associating attributes and access rights to the current user. 
+At all FALs, an identity assertion is signed by an IdP so that it cannot be forged by an attacker. The IdP is the only entity with access to its private key, so a valid signature indicates that the assertion is from the IdP itself and not an attacker. If an RP does not check the validity of the IdP signature, attackers will be able to forge identity assertions and gain access to protected systems without authorization. Additionally, if the relying party does not check the signature, an attacker could modify an otherwise valid assertion in transit, associating attributes and access rights to the current subscriber. 
 
 Some protocols cover the entire assertion with a signature, while others cover only portions of it. The relying party must take care to not accept unsigned portions of the assertion as validated even when presented alongside a signed assertion.
 
@@ -101,7 +101,7 @@ An RP that isn't checking audience parameters will still accept a valid authoriz
 
 ##### 3.2.4. Checking Assertion Uniqueness
 
-An attacker that gains possession of a bearer assertion could try to replay that assertion at an RP in order to take over a user's session. To prevent this, an IdP is required to make each assertion unique. The RP consequently needs to check the assertion for uniqueness within the assertion's expiry window by checking any unique identifiers within the assertion and accepting each unique assertion identifier only once to establish a login with the subscriber. If an assertion is seen multiple times by an RP, especially from multiple connections, the RP can consider this assertion stolen. The RP should remember the identifiers of assertions 
+An attacker that gains possession of a bearer assertion could try to replay that assertion at an RP in order to take over a subscriber's session. To prevent this, an IdP is required to make each assertion unique. The RP consequently needs to check the assertion for uniqueness within the assertion's expiry window by checking any unique identifiers within the assertion and accepting each unique assertion identifier only once to establish a login with the subscriber. If an assertion is seen multiple times by an RP, especially from multiple connections, the RP can consider this assertion stolen. The RP should remember the identifiers of assertions 
 
 ##### 3.2.5. Retrieving IdP Keys
 
@@ -113,9 +113,9 @@ This document covers two main product families that enable federated identity tr
 
 ##### 3.3.1. SAML
 
-Be careful about passing and validating metadata. Incorrectly communicated or configured metadata could leak information about a user that was not approved for distribution. Metadata that is not validated could have been tampered with by an attacker to gain access to valuable personal information.
+Be careful about passing and validating metadata. Incorrectly communicated or configured metadata could leak information about a subscriber that was not approved for distribution. Metadata that is not validated could have been tampered with by an attacker to gain access to valuable personal information.
 
-Always check certificates before accepting identity assertions. Attackers can forge certificates and phish users in an attempt to impersonate them. 
+Always check certificates before accepting identity assertions. Attackers can forge certificates and phish subscribers in an attempt to impersonate them. 
 
 ##### 3.3.2. OpenID Connect
 
@@ -123,31 +123,31 @@ Different OAuth grant types or "flows" are appropriate for different kinds of ap
 
 The authorization code flow should be used whenever possible, particularly for web server, native, or mobile applications. It is the most common and most secure way to implement OAuth, the underlying protocol of OpenID Connect. It can accomodate all three FALs depending on the exact configuration of the application. The authorization code flow makes use of back channel assertion presentation, which reduces the attack surface of the RP significantly by sending the assertion directly from the IdP to the RP without an intermediary party touching it. The RP should authenticate itself when presenting the authorization code to the IdP. If the RP is a native or mobile application, it should use the PKCE extension or dynamic client registration to ensure that different copies of the client software can't impersonate each other at the IdP. 
 
-The implicit grant type is appropriate for applications which are implemented entirely in front-end code and have to capability to store secrets outside of the user's web browser. The lack of ability to store secrets means that these sorts of applications can only function at FAL1 because they have no method of private key management which would enable encryption of identity assertions.
+The implicit grant type is appropriate for applications which are implemented entirely in front-end code and have to capability to store secrets outside of the subscriber's web browser. The lack of ability to store secrets means that these sorts of applications can only function at FAL1 because they have no method of private key management which would enable encryption of identity assertions.
 
 The hybrid grant types are allowable only if all appropriate checks are made by the RP as defined in the standard. The `client credentials` and `resource owner credentials` grant types are not allowed at any FAL.
 
 ### 4. Guidance for Identity Providers
 
-The identity provider is the one party in a federation network that can assert the presence and validity of users and their attributes. The security of all users rests on the security of their identity provider, and a compromise of the IdP could cascade to all downstream parties. As such, it is vitally important that the IdP be held to the highest of security standards in implementation and deployment. The nature of federation protocols allows the IdP to specialize in security in a way that benefits all RPs that connect to it.
+The identity provider is the one party in a federation network that can assert the presence and validity of subscribers and their attributes. The security of all subscribers rests on the security of their identity provider, and a compromise of the IdP could cascade to all downstream parties. As such, it is vitally important that the IdP be held to the highest of security standards in implementation and deployment. The nature of federation protocols allows the IdP to specialize in security in a way that benefits all RPs that connect to it.
 
 #### 4.1. Purpose
 
-As the lynchpin of security in a federation network, IdPs have the difficult task of keeping track of both users and RPs, and connecting them in a secure fashion with a federation protocol. 
+As the lynchpin of security in a federation network, IdPs have the difficult task of keeping track of both subscribers and RPs, and connecting them in a secure fashion with a federation protocol. 
 
 #### 4.2. General Guidance
 
-IdPs manage the primary authenticators and authentication processes for users in a federation. Guidance for managing such authentication can be found in the companion implementation guide for SP 800-63B.
+IdPs manage the primary authenticators and authentication processes for subscribers in a federation. Guidance for managing such authentication can be found in the companion implementation guide for SP 800-63B.
 
 Much of the technical friction in setting up a federation stems from IdPs which are built and configured in such a way that onboarding new RPs requires a significant amount of manual human intervention. Much of this friction is removed when IdPs support automated discovery mechanisms and simple automated registration.
 
-IdPs must securely store all private key material. If the IdPs keys are compromised, an attacker could generate arbitrary assertions and impersonate any user on the network. 
+IdPs must securely store all private key material. If the IdPs keys are compromised, an attacker could generate arbitrary assertions and impersonate any subscriber on the network. 
 
 IdPs must use approved cryptographic systems to generate all key material. Public keys need to be made available to RPs over authenticated protected channels or via trusted out of band processes, such as hand configuration by a systems administrator.
 
 IdPs must securely store any symmetric secrets used by clients in a fashion that reduces the likelihood of their capture, such as by storing a hash of the secret instead of the secret itself. 
 
-IdPs should implement phishing-resistant technologies in user-facing pages and may want to consider the use of heuristic risk-based security for all connections.
+IdPs should implement phishing-resistant technologies in subscriber-facing pages and may want to consider the use of heuristic risk-based security for all connections.
 
 #### 4.3. Guidance by Product Family
 
@@ -161,7 +161,7 @@ Only accept metadata that has been signed by the presenting RP, and always check
 
 Identity federations like InCommon share the metadata of hundreds of IdPs and RPs in a structured manner. Adding your IdP's metadata to such federations will help RPs to find it easily.
 
-Apply best practices to protect user information. All SAML assertions containing personally identifiable information must conform to FAL2. That means the assertion must be encrypted to the relying party.
+Apply best practices to protect subscriber information. All SAML assertions containing personally identifiable information must conform to FAL2. That means the assertion must be encrypted to the relying party.
 
 Assertions containing only authentication information and no personally identifiable information do not need to encrypt their assertions. They may operate at FAL1.
 
@@ -169,7 +169,7 @@ Assertions containing only authentication information and no personally identifi
 
 IdPs should use OpenID Connect's discovery mechanism, published in JSON format at an HTTPS location ending in /.well-known/openid-configuration as specified in the OpenID Connect discovery specification. This document contains all of the information that an RP would need to interact with the server. This document should be available in a well-documented location based on the IdP's issuer URL.
 
-If personally identifiable information is bundled with authentication information in a token, it must be encrypted to the RP and conformant with FAL2. If personally identifiable information is made available at the UserInfo endpoint, it need not be encrypted as a message but must be passed over an authenticated protected channel.
+If personally identifiable information is bundled with authentication information in a token, it must be encrypted to the RP and conformant with FAL2. If personally identifiable information is made available at the UserInfo Endpoint, it need not be encrypted as a message but must be passed over an authenticated protected channel.
 
 It is recommended that OpenID Connect IdPs support a registration endpoint to make it easy for RPs to register without manual intervention.
 
@@ -193,7 +193,7 @@ Typically, OpenID Connect Providers interact with OpenID Connect relying parties
 
 If the ID Token contains personally identifiable information, it must be encrypted to the RP at FAL2. This is accomplished by using the JSON Web Encryption (JWE) specification and a key registered to the client. 
 
-OpenID Connect could reach FAL3 by providing a claim within the ID Token that references a cryptographic key to be presented by the user. 
+OpenID Connect could reach FAL3 by providing a claim within the ID Token that references a cryptographic key to be presented by the subscriber. 
 
 #### 5.3 Personal Identity Verification (PIV) Card 
 
@@ -201,33 +201,33 @@ PIV cards are considered an authentication technology by the SP 800-63 guideline
 
 FALs are independent of AALs, and any authentication device may be used to start a federation transaction at any FAL, including but not limited to a PIV card. Therefore, the use of a PIV does not guarantee a high FAL.
 
-There are many benefits to using federated identity management as opposed to requiring independent registration of PIV cards for each user. Federated identity management protocols such as OpenID Connect allow users to authenticate at a relying party regardless of which authenticator they use at their IdP. This allows relying parties to securely accept registered users whose IdPs do not use PIV cards.
+There are many benefits to using federated identity management as opposed to requiring independent registration of PIV cards for each subscriber. Federated identity management protocols such as OpenID Connect allow subscribers to authenticate at a relying party regardless of which authenticator they use at their IdP. This allows relying parties to securely accept registered subscribers whose IdPs do not use PIV cards.
 
 #### 5.4 Privacy-enhancing Federated Identity
 
-In many cases, relying parties do not need to know the full identity of a user. Relying parties should only request as much information as they need to complete the transaction requested by the user, and IdPs should limit what information relying parties have access to within a transaction. Furthermore, with protocols like OpenID Connect, the attributes of the user can be sent separately from the assertion itself, limiting leakage of this information. 
+In many cases, relying parties do not need to know the full identity of a subscriber. Relying parties should only request as much information as they need to complete the transaction requested by the subscriber, and IdPs should limit what information relying parties have access to within a transaction. Furthermore, with protocols like OpenID Connect, the attributes of the subscriber can be sent separately from the assertion itself, limiting leakage of this information. 
 
-Pairwise identifiers should be used in place of persistent or correlatable identifiers whenever possible. This limits relying parties in attempts of tracking or identifying individual users across different systems. 
+Pairwise identifiers should be used in place of persistent or correlatable identifiers whenever possible. This limits relying parties in attempts of tracking or identifying individual subscribers across different systems. 
 
-When possible, claim references should be used to communicate identity information rather than raw data. For example, if a relying party needs to know whether a user is over eighteen years old, the IdP should respond that the user is over eighteen without sharing the user's age or birthdate.
+When possible, claim references should be used to communicate identity information rather than raw data. For example, if a relying party needs to know whether a subscriber is over eighteen years old, the IdP should respond that the subscriber is over eighteen without sharing the subscriber's age or birthdate.
 
 #### 5.5 Parallel Authentication
 
-In some cases a relying party may wish to confirm certain aspects of a user's identity above and beyond what the IdP provides. For example, a relying party could verify a user with an IdP, receive a picture of the user, and require that an in-person agent verify that the picture matches the identity of the person authenticating. This use case is known as "parallel authentication" because two authentication events are happening in parallel. The focus of FAL is primary on the assertions being passed from the IdP to the RP, so most authentication events occurring at the RP would not affect the FAL of the transaction. 
+In some cases a relying party may wish to confirm certain aspects of a subscriber's identity above and beyond what the IdP provides. For example, a relying party could verify a subscriber with an IdP, receive a picture of the subscriber, and require that an in-person agent verify that the picture matches the identity of the person authenticating. This use case is known as "parallel authentication" because two authentication events are happening in parallel. The focus of FAL is primary on the assertions being passed from the IdP to the RP, so most authentication events occurring at the RP would not affect the FAL of the transaction. 
 
-For holder-of-key transactions, the parallel authentication event occurs by verifying both the assertion from the IdP as well as the user's presentation of proof of their personal key attested to in the assertion. 
+For holder-of-key transactions, the parallel authentication event occurs by verifying both the assertion from the IdP as well as the subscriber's presentation of proof of their personal key attested to in the assertion. 
 
 ### 6. Brokered Identity Management
 
-Some federated identity architectures are based on brokered identity management, where a single broker intermediates transactions between registered IdPs and RPs. In this architecture, each entity in the system only has to register with one broker in order to interoperate with everyone else in the system. It also means that an IdP can authenticate a user without knowledge of which RP requested the authentication event.
+Some federated identity architectures are based on brokered identity management, where a single broker intermediates transactions between registered IdPs and RPs. In this architecture, each entity in the system only has to register with one broker in order to interoperate with everyone else in the system. It also means that an IdP can authenticate a subscriber without knowledge of which RP requested the authentication event.
 
 Recent advances in automated registration processes have made IdP/RP integrations much less onerous than they used to be. It is possible for an IdP and RP to register with each other in a very short amount of time without any manual processes. This has lessened the value of brokered identity architectures, since interoperability can be simple and fast even without a central broker.
 
-While brokered identity management systems may appear to protect privacy by blinding an IdP from an RP, keep in mind that the broker itself is aware of all the parties involved in the transaction, and in some cases can see personally identifiable information about users. Brokered identity management systems do not prevent user tracking all together, they merely shift the ability to track users from the IdPs and RPs to the broker.
+While brokered identity management systems may appear to protect privacy by blinding an IdP from an RP, keep in mind that the broker itself is aware of all the parties involved in the transaction, and in some cases can see personally identifiable information about subscribers. Brokered identity management systems do not prevent subscriber tracking all together, they merely shift the ability to track subscribers from the IdPs and RPs to the broker.
 
-Additionally, because brokers have access to active valid identity assertions, they are capable of impersonating users. This increases the risk inherent in the entire architecture, since the broker represents a single point of failure which, if it is compromised, can in turn compromise every participant in the system.
+Additionally, because brokers have access to active valid identity assertions, they are capable of impersonating subscribers. This increases the risk inherent in the entire architecture, since the broker represents a single point of failure which, if it is compromised, can in turn compromise every participant in the system.
 
-NIST has been promoting privacy-enhancing technology in the brokered identity management space through the [Privacy-Enhanced Identity Federation project](https://nccoe.nist.gov/projects/building-blocks/privacy-enhanced-identity-brokers). This NIST building block outlines a set of goals which would constitute a new kind of brokered architecture. This architecture leverages a broker which cannot impersonate or track users. This architecture is still theoretical, and may allow for a privacy-preserving and secure version of brokered identity management in the future.
+NIST has been promoting privacy-enhancing technology in the brokered identity management space through the [Privacy-Enhanced Identity Federation project](https://nccoe.nist.gov/projects/building-blocks/privacy-enhanced-identity-brokers). This NIST building block outlines a set of goals which would constitute a new kind of brokered architecture. This architecture leverages a broker which cannot impersonate or track subscribers. This architecture is still theoretical, and may allow for a privacy-preserving and secure version of brokered identity management in the future.
 
 ### 7. Educational Resources
 
