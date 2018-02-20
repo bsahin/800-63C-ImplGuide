@@ -142,7 +142,7 @@ Much of the technical friction in setting up a federation stems from IdPs which 
 
 IdPs must use approved cryptographic systems to generate all key material [[section 4.1]]. IdPs must securely store all private key material. Public keys need to be made available to RPs over authenticated protected channels or via trusted out of band processes, such as hand configuration by a systems administrator. An IdP can use a single key pair across different RPs on the network, and the keys can be rotated on a regular basis.
 
-Private keys need to be protected from subscribers, RPs, and other unintended parties. If the IdP's private keys are compromised, an attacker could generate arbitrary assertions and impersonate any subscriber on the network at any RP. If an RP's keys are compromised, an attacker could impersonate a request from that RP but not attack any other RPs or the IdP itself. 
+The IdP's private keys, which are used to sign assertions, need to be protected from subscribers, RPs, and other unintended parties. If the IdP's private keys are compromised, an attacker could generate arbitrary assertions and impersonate any subscriber on the network at any RP. If an RP's keys are compromised, an attacker could impersonate a request from that RP but not attack any other RPs or the IdP itself. 
 
 IdPs must securely store any symmetric secrets used by RPs in a fashion that reduces the likelihood of their capture, such as by storing a hash of the secret instead of the secret itself. All symmetric secrets need to be generated using approved cryptography, and a different secret needs to be generated for every RP that the IdP associates with. Similarly, if an RP talks to multiple IdPs, it should have a separate secret for each IdP. 
 
