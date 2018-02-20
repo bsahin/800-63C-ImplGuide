@@ -1,35 +1,6 @@
-# Federation Operations Guide
+# Federation Implementation Resources
 
 ## Table of Contents
-
-1. [Introduction](#1-introduction)  
-1. [Risk Management](#2-risk-management)
-1. [Selecting an FAL](#3-selecting-an-fal)  
-1. [Guidance for Relying Parties](#4-guidance-for-relying-parties)  
- 4.1 [Purpose](#41-purpose)  
- 4.2 [General Guidance](#42-general-guidance)  
-     * 4.2.1 [Validating IdP Signatures](#421-validating-idp-signatures)  
-     * 4.2.2 [Checking Assertion Expirations](#422-checking-assertion-expirations) 
-     * 4.2.3 [Checking Audience Parameters](#423-checking-audience-parameters)  
-4.3 [Guidance by Product Family](#43-guidance-by-product-family)  
-     * 4.3.1 [SAML](#431-saml)  
-     * 4.3.2 [OAuth and OpenID Connect](#432-oauth-and-openid-connect) 
-1. [Guidance for Identity Providers](#5-guidance-for-identity-providers)  
- 5.1 [Purpose](#51-purpose)  
- 5.2 [General Guidance](#52-general-guidance)  
- 5.3 [Guidance by Product Family](#53-guidance-by-product-family)  
-     * 5.3.1 [SAML](#531-saml)  
-     * 5.3.2 [OAuth and OpenID Connect](#532-oauth-and-openid-connect) 
-1. [Example Scenarios](#6-example-scenarios)  
- 6.1 [Shibboleth and SAML](#61-shibboleth-and-saml)  
- 6.2 [OpenID Connect and OAuth](#62-openid-connect-and-oauth)  
- 6.3 [Personal Identity Verification (PIV) card](#63-personal-identity-verification-piv-card)  
- 6.4 [Privacy-enhancing Federated Identity](#64-privacy-enhancing-federated-identity)  
- 6.5 [Parallel Authentication](#65-parallel-authentication)  
-1. [Brokered Identity Management](#7-brokered-identity-management)
-1. [Educational Resources](#8-educational-resources)
-1. [Communicating with Stakeholders](#9-communicating-with-stakeholders)
-1. [Conclusion](#10-conclusion)
 
 ### 1. Introduction
 
