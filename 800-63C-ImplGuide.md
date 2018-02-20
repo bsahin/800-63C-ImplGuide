@@ -146,6 +146,8 @@ The IdP's private keys, which are used to sign assertions, need to be protected 
 
 IdPs must securely store any symmetric secrets used by RPs in a fashion that reduces the likelihood of their capture, such as by storing a hash of the secret instead of the secret itself. All symmetric secrets need to be generated using approved cryptography, and a different secret needs to be generated for every RP that the IdP associates with. Similarly, if an RP talks to multiple IdPs, it should have a separate secret for each IdP. 
 
+If an IdP provides public and private keypairs to subscribers or RPs, the IdP should store only the public portion of the key. 
+
 #### 4.3. Guidance by Product Family
 
 This document covers two main product families that enable federated identity transactions - SAML and OpenID Connect, the latter of which is built on top of OAuth. Other protocols and approaches are possible to use while fulfilling the requirements of the guidelines.
