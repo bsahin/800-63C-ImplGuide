@@ -158,7 +158,7 @@ Both IdPs and RPs should publish metadata in a well-known location. While there 
 
 The IdP needs to always check signatures on metadata, and only accept metadata that has been signed by the presenting RP.
 
-Identity federations like InCommon share the metadata of hundreds of IdPs and RPs in a structured manner [[section 5.1.3]]. Adding an IdP's metadata to such federations will help RPs to find it easily.
+Identity federations like [InCommon](https://www.incommon.org/) share the metadata of hundreds of IdPs and RPs in a structured manner [[section 5.1.3]]. Adding an IdP's metadata to such federations will help RPs to find it easily.
 
 Apply best practices to protect subscriber information. All SAML assertions containing personally identifiable information should be encrypted to the relying party to protect the PII from being leaked to the browser. Assertions containing only authentication information and no personally identifiable information can relax this encryption requirement.
 
@@ -256,4 +256,4 @@ Conformance to FAL2 or FAL3 is appropriate for some business cases where there i
 
 ### 9. Conclusion
 
-There are many ways to secure federated identity transactions, and many products do a very adequate job of it today, but there are ways to improve your security posture with regard to federation if doing so makes sense in a overall risk management framework.
+There are many ways to secure federated identity transactions, and many products do a very adequate job of it today, but there are ways to improve security posture with regard to federation if doing so makes sense in an overall risk management framework.
